@@ -8,12 +8,23 @@ import { ThemedMain } from '@/components/ThemedMain';
 import React, { useEffect, useState } from 'react';
 import { StatusBar, View, Text, TouchableOpacity  } from 'react-native';
 import { useRouter, Link } from 'expo-router';
+import useWebSocket from '@/hooks/useWebSocket';
 export default function HomeScreen() {
+    const { isConnected, message, sendMessage, closeConnection, error, connect, isConnecting } = useWebSocket('ws://10.0.25.87:8765');
     const router = useRouter();
+
+
+    // useEffect(() => {
+    //   sendMessage(JSON.stringify({
+    //     cmd: "device/online"
+    //   }))
+    // }, [])
+    
 
     const handleNavigateToDetails = () => {
         router.push('/details');
     };
+    
     return (
         <ThemedMain style={styles.mainBox}>
             <ThemedText style={styles.mainTitle}>优家庭</ThemedText>
@@ -30,7 +41,7 @@ export default function HomeScreen() {
                 </TouchableOpacity >
                 <ThemedView style={styles.gridItemBox}></ThemedView>
             </ThemedView>
-
+            {/* <Text>{message}</Text> */}
         </ThemedMain>
     );
 }

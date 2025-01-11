@@ -1,12 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { ThemedMain } from '@/components/ThemedMain';
 import { useRouter, Link } from 'expo-router';
+import useWebSocket from '@/hooks/useWebSocket';
 
 export default function DetailsScreen() {
     const router = useRouter();
 
+    const { isConnected, message, sendMessage, closeConnection, error, connect, isConnecting, lastMessage } = useWebSocket();
+
+    const [temperature, setTemperature] = useState(null);
+    const [humidity, setHumidity] = useState(null);
+    
+    const [updateTime, setUpdateTime] = useState(null);
     const [isOnline, setIsOnline] = React.useState(false);
+
+    useEffect(() => {
+      if (message) {
+        try {
+          let msg = JSON.parse(message)
+          
+          if(msg.cmd === "temp/hum") {
+            setTemperature(msg.data.device_temp);
+            setHumidity(msg.data.device_humidity);
+            setUpdateTime(msg.data.device_update_time)
+            setIsOnline(msg.data.online == 1)
+          }
+        }catch(e) {
+
+        }
+        
+      }
+    }, [message, lastMessage]);
+
+    
 
     const gotoBack = () => {
         router.back();
@@ -33,16 +60,17 @@ export default function DetailsScreen() {
             
             <View style={styles.box}>
                 <View style={styles.boxItem}>
-                    <Text style={styles.sum}>22°</Text>
+                    <Text style={styles.sum}>{temperature}°</Text>
                     <Text style={styles.tips}>温度</Text>
                 </View>
                 <View style={styles.boxItem}>
-                    <Text style={styles.sum}>92%</Text>
+                    <Text style={styles.sum}>{humidity}%</Text>
                     <Text style={styles.tips}>湿度</Text>
                 </View>
             </View>
         </View>
-        <Text style={styles.date}>数据上报时间：2024年10月12日12:04</Text>
+        <Text style={styles.date}>数据上报时间：{updateTime}</Text>
+        {/* {fullMessage && <Text>Full Message: {JSON.stringify(fullMessage)}</Text>} */}
     </ThemedMain>
   );
 }
