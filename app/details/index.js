@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { ThemedMain } from '@/components/ThemedMain';
 import { useRouter, Link } from 'expo-router';
 import useWebSocket from '@/hooks/useWebSocket';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function DetailsScreen() {
     const router = useRouter();
@@ -16,6 +18,25 @@ export default function DetailsScreen() {
     const [isOnline, setIsOnline] = React.useState(false);
 
     useEffect(() => {
+      // Load data from AsyncStorage on component mount
+      const loadData = async () => {
+        try {
+          const storedData = await AsyncStorage.getItem('sensorData');
+          if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            setTemperature(parsedData.temperature);
+            setHumidity(parsedData.humidity);
+            setUpdateTime(parsedData.updateTime);
+            setIsOnline(parsedData.isOnline);
+          }
+        } catch (error) {
+          console.error('Failed to load data from AsyncStorage', error);
+        }
+      };
+      loadData();
+    }, []);
+
+    useEffect(() => {
       if (message) {
         try {
           let msg = JSON.parse(message)
@@ -25,6 +46,20 @@ export default function DetailsScreen() {
             setHumidity(msg.data.device_humidity);
             setUpdateTime(msg.data.device_update_time)
             setIsOnline(msg.data.online == 1)
+            const saveData = async () => {
+              try {
+                const dataToStore = {
+                  temperature: msg.data.device_temp,
+                  humidity: msg.data.device_humidity,
+                  updateTime: msg.data.device_update_time,
+                  isOnline: msg.data.online == 1,
+                };
+                await AsyncStorage.setItem('sensorData', JSON.stringify(dataToStore));
+              } catch (error) {
+                console.error('Failed to save data to AsyncStorage', error);
+              }
+            };
+            saveData();
           }
         }catch(e) {
 

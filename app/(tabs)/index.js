@@ -10,7 +10,7 @@ import { StatusBar, View, Text, TouchableOpacity  } from 'react-native';
 import { useRouter, Link } from 'expo-router';
 import useWebSocket from '@/hooks/useWebSocket';
 export default function HomeScreen() {
-    const { isConnected, message, sendMessage, closeConnection, error, connect, isConnecting } = useWebSocket('ws://10.0.25.87:8765');
+    const { isConnected, message, sendMessage, closeConnection, error, connect, isConnecting } = useWebSocket('ws://192.168.31.101:8765');
     const router = useRouter();
 
 
@@ -39,7 +39,7 @@ export default function HomeScreen() {
                       <Text style={styles.floatingText}>离线</Text>
                     </View>
                 </TouchableOpacity >
-                <ThemedView style={styles.gridItemBox}></ThemedView>
+                {/* <ThemedView style={styles.gridItemBox}></ThemedView> */}
             </ThemedView>
             {/* <Text>{message}</Text> */}
         </ThemedMain>
